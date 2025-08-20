@@ -25,6 +25,18 @@ async fn custom_handler(
 }
 
 #[cfg(feature = "ssr")]
+async fn logging_middleware(
+    uri: axum::http::Uri,
+    request: axum::extract::Request,
+    next: axum::middleware::Next,
+) -> Response {
+    println!("enter {uri}");
+    let response = next.run(request).await;
+    println!("leave");
+    response
+}
+
+#[cfg(feature = "ssr")]
 #[tokio::main]
 async fn main() {
     use crate::todo::{ssr::db, *};
@@ -52,6 +64,7 @@ async fn main() {
             move || shell(leptos_options.clone())
         })
         .fallback(leptos_axum::file_and_error_handler(shell))
+        .layer(axum::middleware::from_fn(logging_middleware))
         .with_state(leptos_options);
 
     // run our app with hyper

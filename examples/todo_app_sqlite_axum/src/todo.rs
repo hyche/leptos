@@ -41,7 +41,7 @@ pub mod ssr {
     }
 }
 
-#[server]
+#[server(prefix = "/api", endpoint = "todos")]
 pub async fn get_todos() -> Result<Vec<Todo>, ServerFnError> {
     use self::ssr::*;
     use http::request::Parts;
